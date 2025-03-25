@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ERole {
+  DRIVER
+  ADMIN
+  MANAGER
+  SUB_MANAGER
+}
+
+enum EStatus {
+  AVAILABLE
+  NOT_AVAILABLE
+  APPROVED
+}
+
+model User {
+  id                      Int                       @id @default(autoincrement())
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  isActive                Boolean                   @default(true)
+  role                    ERole                     @default(DRIVER)
+  email                   String?                   @unique
+  password                String
+  fullName                String
+  busStopId               Int?
+  BusStop                 BusStop?                  @relation(fields: [busStopId], references: [id])
+  Admin                   Admin[]
+  Supervisor              Supervisor[]
+  Driver                  Driver[]
+  WeelkyTimeTableActivity WeelkyTimeTableActivity[]
+  DailyActivity           DailyActivity[]
+  Zone                    Zone?                     @relation(fields: [zoneId], references: [id])
+  zoneId                  Int?
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Supervisor {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Driver {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  phone     String?
+  email     String?  @unique
+  status    EStatus  @default(AVAILABLE)
+  userId    Int
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Zone {
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  zoneName    String
+  destination String
+  Bus         Bus[]
+  User        User[]
+  BusStop     BusStop[]
+}
+
+model BusStop {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  busStopName String
+  zoneId      Int
+  zone        Zone?    @relation(fields: [zoneId], references: [id])
+  User        User[]
+}
+
+model Bus {
+  id                      Int                       @id @default(autoincrement())
+  plateNo                 String                    @unique
+  zoneId                  Int
+  zone                    Zone?                     @relation(fields: [zoneId], references: [id])
+  WeelkyTimeTableActivity WeelkyTimeTableActivity[]
+  DailyActivity           DailyActivity[]
+}
+
+model WeelkyTimeTableActivity {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  driverId  Int
+  driver    User?     @relation(fields: [driverId], references: [id])
+  busId     Int
+  bus       Bus?      @relation(fields: [busId], references: [id])
+  hasLeave  String?
+  leaveDate DateTime?
+}
+
+model DailyActivity {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  driverId    Int
+  driver      User?    @relation(fields: [driverId], references: [id])
+  busId       Int
+  bus         Bus?     @relation(fields: [busId], references: [id])
+  description String
+}
