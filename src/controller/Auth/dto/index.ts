@@ -1,7 +1,9 @@
 export interface AuthSingUpDTO {
-  fullNames: string
-  email: string
-  password: string
+  fullName: string;
+  email: string;
+  password: string;
+  isActive: boolean;
+  role: string;
 }
 
-export interface LoginDTO extends Omit<AuthSingUpDTO, 'fullNames'> {}
+export interface LoginDTO extends Omit<AuthSingUpDTO, "fullName"> {}

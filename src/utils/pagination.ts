@@ -1,23 +1,36 @@
-import { IPage } from './dto'
+import { IPage } from "./dto";
 
-interface PaginateArgs {
-  include?: any
-}
+type PrismaFindManyArgs = {
+  where?: any;
+  select?: any;
+  include?: any;
+  orderBy?: any;
+  skip?: number;
+  take?: number;
+};
 
-export async function paginate<TModel, TFindManyArgs extends PaginateArgs>(
+export async function paginate<
+  TModel,
+  TFindManyArgs extends PrismaFindManyArgs = PrismaFindManyArgs
+>(
   model: any,
-  args: Omit<TFindManyArgs, 'take' | 'skip'>,
+  args: TFindManyArgs,
   page = 0,
   size = 10
 ): Promise<IPage<TModel>> {
-  const { include, ...argsCopy } = args
-  const items = (await model.findMany({
-    ...argsCopy,
-    take: size,
-    skip: size * page,
-  })) as TModel[]
+  const countArgs = {
+    where: args.where,
+    orderBy: args.orderBy,
+  };
 
-  const totalItems = await model.count(argsCopy)
+  const [items, totalItems] = await Promise.all([
+    model.findMany({
+      ...args,
+      take: size,
+      skip: size * page,
+    }) as Promise<TModel[]>,
+    model.count(countArgs),
+  ]);
 
   return {
     items,
@@ -26,5 +39,5 @@ export async function paginate<TModel, TFindManyArgs extends PaginateArgs>(
     itemsPerPage: size,
     totalPages: Math.ceil(totalItems / size),
     currentPage: page,
-  }
+  };
 }

@@ -31,13 +31,23 @@ CREATE TABLE "Admin" (
 );
 
 -- CreateTable
-CREATE TABLE "Supervisor" (
+CREATE TABLE "Manager" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER NOT NULL,
 
-    CONSTRAINT "Supervisor_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Manager_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "SubManager" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" INTEGER NOT NULL,
+
+    CONSTRAINT "SubManager_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -45,9 +55,6 @@ CREATE TABLE "Driver" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "name" TEXT NOT NULL,
-    "phone" TEXT,
-    "email" TEXT,
     "status" "EStatus" NOT NULL DEFAULT 'AVAILABLE',
     "userId" INTEGER NOT NULL,
 
@@ -81,6 +88,7 @@ CREATE TABLE "Bus" (
     "id" SERIAL NOT NULL,
     "plateNo" TEXT NOT NULL,
     "zoneId" INTEGER NOT NULL,
+    "busStopId" INTEGER NOT NULL,
 
     CONSTRAINT "Bus_pkey" PRIMARY KEY ("id")
 );
@@ -114,9 +122,6 @@ CREATE TABLE "DailyActivity" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Driver_email_key" ON "Driver"("email");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Bus_plateNo_key" ON "Bus"("plateNo");
 
 -- AddForeignKey
@@ -129,7 +134,10 @@ ALTER TABLE "User" ADD CONSTRAINT "User_zoneId_fkey" FOREIGN KEY ("zoneId") REFE
 ALTER TABLE "Admin" ADD CONSTRAINT "Admin_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Supervisor" ADD CONSTRAINT "Supervisor_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Manager" ADD CONSTRAINT "Manager_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SubManager" ADD CONSTRAINT "SubManager_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Driver" ADD CONSTRAINT "Driver_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -141,13 +149,16 @@ ALTER TABLE "BusStop" ADD CONSTRAINT "BusStop_zoneId_fkey" FOREIGN KEY ("zoneId"
 ALTER TABLE "Bus" ADD CONSTRAINT "Bus_zoneId_fkey" FOREIGN KEY ("zoneId") REFERENCES "Zone"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "WeelkyTimeTableActivity" ADD CONSTRAINT "WeelkyTimeTableActivity_driverId_fkey" FOREIGN KEY ("driverId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Bus" ADD CONSTRAINT "Bus_busStopId_fkey" FOREIGN KEY ("busStopId") REFERENCES "BusStop"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "WeelkyTimeTableActivity" ADD CONSTRAINT "WeelkyTimeTableActivity_busId_fkey" FOREIGN KEY ("busId") REFERENCES "Bus"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "DailyActivity" ADD CONSTRAINT "DailyActivity_driverId_fkey" FOREIGN KEY ("driverId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "WeelkyTimeTableActivity" ADD CONSTRAINT "WeelkyTimeTableActivity_driverId_fkey" FOREIGN KEY ("driverId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "DailyActivity" ADD CONSTRAINT "DailyActivity_busId_fkey" FOREIGN KEY ("busId") REFERENCES "Bus"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DailyActivity" ADD CONSTRAINT "DailyActivity_driverId_fkey" FOREIGN KEY ("driverId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
