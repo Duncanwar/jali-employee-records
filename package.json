@@ -12,8 +12,7 @@
     "start": "npx prisma generate dev && node dist/index.js",
     "dev": "npx prisma generate dev && nodemon --exec ts-node src/index.ts",
     "prisma:generate": "npx prisma generate",
-    "test": "npx jest --coverage",
-    "seed": "ts-node src/prisma/seed.ts"
+    "test": "npx jest --coverage"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
@@ -44,6 +43,6 @@
     "typescript": "^5.4.5"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts "
+    "seed": "ts-node prisma/busseed.ts "
   }
 }

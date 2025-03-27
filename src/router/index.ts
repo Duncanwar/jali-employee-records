@@ -11,7 +11,6 @@ import DailyRoute from "./dailyActivity";
 import isAdmin from "../middleware/isAdmin";
 import isManager from "../middleware/isManager";
 import isSubManager from "../middleware/isSubManager";
-import { dailyActivity } from "../controller/DailyActivity/dailyActivity";
 
 const router: Router = Router();
 

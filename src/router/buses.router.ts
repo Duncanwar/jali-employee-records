@@ -1,9 +1,9 @@
 import { Router } from "express";
-import ZoneController from "../controller/Zone/zone";
+import BusesController from "../controller/Buses/buses";
 
-const ZoneRouter: Router = Router();
+const BusesRouter: Router = Router();
 
-// ZoneRouter.post("/create-driver", ZoneController.registerDriver);
-ZoneRouter.get("/get-zone", ZoneController.getZone);
+// BusesRouter.post("/create-driver", BusesController.registerDriver);
+BusesRouter.get("/get-buses", BusesController.getBuses);
 
-export default ZoneRouter;
+export default BusesRouter;

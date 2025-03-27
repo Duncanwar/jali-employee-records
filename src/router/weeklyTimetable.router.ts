@@ -1,10 +1,14 @@
 import { Router } from "express";
-import { generateWeeklyTimetable } from "../controller/WeeklyTimetable/weeklyTimetable";
+import {
+  generateWeeklyTimetable,
+  getDailyTimetable,
+  getWeeklyTimetable,
+} from "../controller/WeeklyTimetable/weeklyTimetable";
 
 const weelkyTimeTableRouter: Router = Router();
 
 weelkyTimeTableRouter.get("/assign-drivers", generateWeeklyTimetable);
-// weelkyTimeTableRouter.get("/run-driver", runAssignment);
-// weelkyTimeTableRouter.get("/get-driver", getAvailableDrivers);
+weelkyTimeTableRouter.get("/get-timetable", getWeeklyTimetable);
+weelkyTimeTableRouter.get("/get-timetable/daily", getDailyTimetable);
 
 export default weelkyTimeTableRouter;

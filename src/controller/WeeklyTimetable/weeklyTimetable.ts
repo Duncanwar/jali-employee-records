@@ -1,5 +1,7 @@
 import cron from "node-cron";
 import { prisma } from "../../config/database";
+import { Response as ExpressResponse, Request, NextFunction } from "express";
+import Response from "../../services/response";
 
 export async function generateWeeklyTimetable() {
   const today = new Date();
@@ -87,4 +89,41 @@ export async function generateWeeklyTimetable() {
   console.log(
     `✅ Weekly timetable generated from ${startOfWeek.toDateString()} to ${endOfWeek.toDateString()}`
   );
+}
+
+export async function getWeeklyTimetable(
+  req: Request,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<ExpressResponse | void> {
+  const timetable = await prisma.weelkyTimeTableActivity.findMany({
+    include: { bus: true, driver: true },
+  });
+  return Response.send(res, 201, "Timetable displayed", timetable);
+}
+export async function getDailyTimetable(
+  req: Request,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<ExpressResponse | void> {
+  // const { dayOfWeek } = req.params;
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const today = daysOfWeek[new Date().getDay()];
+  console.log(today);
+  const timetable = await prisma.weelkyTimeTableActivity.findMany({
+    where: { dayOfWeek: today },
+    include: {
+      bus: true,
+      driver: true,
+    },
+  });
+  return Response.send(res, 201, "Timetable for Today", timetable);
 }
