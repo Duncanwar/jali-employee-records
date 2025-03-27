@@ -19,6 +19,7 @@ async function main() {
       { busStopName: "Nyabugogo Bus Terminal", zoneId: createzone.id },
     ],
   });
+
   const busStop = await prisma.busStop.findFirst();
 
   if (!busStop) {

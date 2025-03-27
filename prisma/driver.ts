@@ -17,29 +17,89 @@ async function main() {
       userId: driver1.id,
     },
   });
-  const userManager = await prisma.user.create({
+  const driver2 = await prisma.user.create({
     data: {
-      fullName: "Kagabo Peter",
-      email: "pet@man.com",
+      fullName: "Stanilas",
+      email: "dr2@dr2.com",
       isActive: true,
-      role: ERole.MANAGER,
+      role: ERole.ADMIN,
       password: await bcrypt.hash("1212", 10),
     },
   });
-  await prisma.manager.create({
-    data: { userId: userManager.id },
-  });
-  const userSubManger = await prisma.user.create({
+  await prisma.admin.create({
     data: {
-      fullName: "Kalisa Dan",
-      email: "dan@subman.com",
+      userId: driver2.id,
+    },
+  });
+  const driver3 = await prisma.user.create({
+    data: {
+      fullName: "Kamoso Dani",
+      email: "dr3@dr3.com",
       isActive: true,
-      role: ERole.MANAGER,
+      role: ERole.ADMIN,
       password: await bcrypt.hash("1212", 10),
     },
   });
-  await prisma.subManager.create({
-    data: { userId: userSubManger.id },
+  await prisma.admin.create({
+    data: {
+      userId: driver3.id,
+    },
+  });
+  const driver4 = await prisma.user.create({
+    data: {
+      fullName: "Mpano",
+      email: "dr4@dr4.com",
+      isActive: true,
+      role: ERole.ADMIN,
+      password: await bcrypt.hash("1212", 10),
+    },
+  });
+  await prisma.admin.create({
+    data: {
+      userId: driver4.id,
+    },
+  });
+  const driver5 = await prisma.user.create({
+    data: {
+      fullName: "Desire",
+      email: "dr5@dr5.com",
+      isActive: true,
+      role: ERole.ADMIN,
+      password: await bcrypt.hash("1212", 10),
+    },
+  });
+  await prisma.admin.create({
+    data: {
+      userId: driver5.id,
+    },
+  });
+  const driver6 = await prisma.user.create({
+    data: {
+      fullName: "Karoli",
+      email: "dr6@dr6.com",
+      isActive: true,
+      role: ERole.ADMIN,
+      password: await bcrypt.hash("1212", 10),
+    },
+  });
+  await prisma.admin.create({
+    data: {
+      userId: driver6.id,
+    },
+  });
+  const driver7 = await prisma.user.create({
+    data: {
+      fullName: "Mupenzi",
+      email: "dr7@dr7.com",
+      isActive: true,
+      role: ERole.ADMIN,
+      password: await bcrypt.hash("1212", 10),
+    },
+  });
+  await prisma.admin.create({
+    data: {
+      userId: driver7.id,
+    },
   });
 }
 main()
