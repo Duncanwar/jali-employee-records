@@ -13,7 +13,7 @@
     "dev": "npx prisma generate dev && nodemon --exec ts-node src/index.ts",
     "prisma:generate": "npx prisma generate",
     "test": "npx jest --coverage",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node src/prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
