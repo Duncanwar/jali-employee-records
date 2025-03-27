@@ -37,4 +37,37 @@ export default class SubManagerController {
       next(error);
     }
   }
+  // Sub-manager approves the bus arrival (at the bus station)
+  static async approveArrival(req: Request, res: ExpressResponse) {
+    const { id } = req.params; // The DailyActivity ID
+    const { userId, busId } = req.body; // Assuming sub-manager's userId is sent in the body
+
+    try {
+      const dailyActivity = await prisma.dailyActivity.findFirst({
+        where: {
+          id: parseInt(id),
+          busId: busId, // Ensure the activity belongs to this bus
+          busArrivalTime: null, // Only update if the bus has not arrived yet
+        },
+      });
+
+      if (!dailyActivity) {
+        return res
+          .status(404)
+          .json({ error: "No ongoing activity found for the specified bus" });
+      }
+
+      // Update the arrival time and approval status
+      const updatedActivity = await prisma.dailyActivity.update({
+        where: { id: parseInt(id) },
+        data: {
+          busArrivalTime: new Date(),
+        },
+      });
+
+      return res.json({ message: "Bus arrival approved", updatedActivity });
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to approve bus arrival" });
+    }
+  }
 }

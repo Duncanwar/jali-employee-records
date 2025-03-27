@@ -21,7 +21,6 @@ export const authenticate = (
       throw new UnauthorizedException();
     } else {
       req.user = isValid;
-      console.log(req.user, "req user");
       next();
     }
   } catch (err) {
