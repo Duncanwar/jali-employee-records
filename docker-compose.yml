@@ -1,34 +1,13 @@
-
-
 services:
   advanced_api:
     container_name: todo_api
     image: akashi77/todo-api
     ports:
-      - 9000:9000
+      - 8000:8000
     volumes:
       - .:/usr/src/app
     environment:
-      JWT_KEY: ${JWT_KEY}
+      JWT_KEY: ${JWT_KEY} 
       DATABASE_URL: ${DATABASE_URL}
-      NODE_ENV: ${NODE_ENV}
+      NODE_ENV: ${NODE_ENV} 
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
-    depends_on:
-      - db
-
-  db:
-    image: postgres
-    container_name: postgres_db
-    restart: always
-    shm_size: 128mb
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: mydatabase
-    ports:
-      - 5432:5432
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
