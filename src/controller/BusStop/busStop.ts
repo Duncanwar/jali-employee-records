@@ -28,7 +28,7 @@ export default class BusStopController {
         },
       });
 
-      return Response.send(res, 200, "Drivers retrieved successfully", {
+      return Response.send(res, 200, "Bus Stop retrieved successfully", {
         items: busStop,
         itemCount: busStop.length,
         itemsPerPage: size,

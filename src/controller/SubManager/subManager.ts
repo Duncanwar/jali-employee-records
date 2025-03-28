@@ -41,6 +41,7 @@ export default class SubManagerController {
   static async approveArrival(req: Request, res: ExpressResponse) {
     const { id } = req.params; // The DailyActivity ID
     const { userId, busId } = req.body; // Assuming sub-manager's userId is sent in the body
+    console.log("no1");
 
     try {
       const dailyActivity = await prisma.dailyActivity.findFirst({
@@ -50,6 +51,7 @@ export default class SubManagerController {
           busArrivalTime: null, // Only update if the bus has not arrived yet
         },
       });
+      console.log("no2");
 
       if (!dailyActivity) {
         return res
@@ -67,6 +69,7 @@ export default class SubManagerController {
 
       return res.json({ message: "Bus arrival approved", updatedActivity });
     } catch (error) {
+      console.log(error);
       return res.status(500).json({ error: "Failed to approve bus arrival" });
     }
   }

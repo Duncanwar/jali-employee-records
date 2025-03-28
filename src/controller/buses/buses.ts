@@ -26,7 +26,7 @@ export default class BusesController {
         },
       });
 
-      return Response.send(res, 200, "Drivers retrieved successfully", {
+      return Response.send(res, 200, "Bus retrieved successfully", {
         items: bus,
         itemCount: bus.length,
         itemsPerPage: size,

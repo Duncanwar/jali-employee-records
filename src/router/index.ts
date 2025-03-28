@@ -8,14 +8,13 @@ import BusStopRoute from "./busStop.router";
 import WeeklyTimetable from "./weeklyTimetable.router";
 import ManagerRoute from "./manager.route";
 import DailyRoute from "./dailyActivity";
-import isAdmin from "../middleware/isAdmin";
 import isManager from "../middleware/isManager";
 import isSubManager from "../middleware/isSubManager";
 
 const router: Router = Router();
 
 router.use("/auth", ErrorHandler.watch(AuthRouter));
-router.use("/driver", [authenticate, isAdmin], ErrorHandler.watch(DriverRoute));
+router.use("/driver", [authenticate], ErrorHandler.watch(DriverRoute));
 router.use("/buses", authenticate, ErrorHandler.watch(BusesRoute));
 router.use("/busStop", authenticate, ErrorHandler.watch(BusStopRoute));
 router.use("/weekly", authenticate, ErrorHandler.watch(WeeklyTimetable));

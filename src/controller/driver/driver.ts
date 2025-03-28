@@ -76,4 +76,26 @@ export default class DriverController {
       next(error);
     }
   }
+  static async dayOffByUser(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    console.log(req.user);
+    const dayoff: any = await prisma.leaveSchedule.findFirst({
+      where: { driverId: req.user?.id },
+    });
+    return Response.send(res, 200, "your day off", dayoff);
+  }
+
+  static async dayOffInWeek(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    const dayoff: any = await prisma.leaveSchedule.findMany({
+      include: { driver: true },
+    });
+    return Response.send(res, 200, "your day off", dayoff);
+  }
 }

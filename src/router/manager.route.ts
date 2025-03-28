@@ -11,12 +11,9 @@ router.post(
   ManagerController.startCarWash
 );
 router.get("/get-manager", ManagerController.getManager);
+router.get("/get-submanager", ManagerController.getManager);
 
 // Sub-manager approves bus arrival
-router.post(
-  "/daily-activity/:id/approve-arrival",
-  SubManagerController.approveArrival
-);
 
 // Manager clicks to end the car wash (end of day)
 router.post("/daily-activity/:id/end-car-wash", ManagerController.endCarWash);
