@@ -87,6 +87,7 @@ model BusStop {
 model Bus {
   id                      Int                       @id @default(autoincrement())
   plateNo                 String                    @unique
+  status                  EStatus
   zoneId                  Int
   zone                    Zone                      @relation(fields: [zoneId], references: [id])
   busStopId               Int

@@ -36,4 +36,70 @@ export default class BusesController {
       next(error);
     }
   }
+  static async createBus(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      const { plateNo, zoneId, busStopId, status } = req.body;
+
+      // Fetch paginated drivers
+      const bus = await prisma.bus.create({
+        data: {
+          plateNo: plateNo,
+          zoneId: zoneId,
+          busStopId: busStopId,
+          status,
+        },
+      });
+
+      return Response.send(res, 201, "Bus created", bus);
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async updateBus(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      const { id } = req.params;
+      const { plateNo, zoneId, busStopId, status } = req.body;
+
+      // Fetch paginated drivers
+      const bus = await prisma.bus.update({
+        where: { id: Number(id) },
+        data: {
+          plateNo: plateNo,
+          zoneId: zoneId,
+          busStopId: busStopId,
+          status: status,
+        },
+      });
+
+      return Response.send(res, 201, "Bus updated", bus);
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async deleteBus(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      const { id } = req.params;
+
+      // Fetch paginated drivers
+      const bus = await prisma.bus.delete({
+        where: { id: Number(id) },
+      });
+
+      return Response.send(res, 200, "Bus deleted", bus);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

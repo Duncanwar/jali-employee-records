@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { EStatus, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -26,18 +26,18 @@ async function main() {
     throw new Error("No bus stops found! Please seed bus stops first.");
   }
 
-  await prisma.bus.createMany({
-    data: [
-      { plateNo: "RAC 239 W", zoneId: createzone.id, busStopId: busStop?.id },
-      { plateNo: "RAD 500 Q", zoneId: createzone.id, busStopId: busStop?.id },
-      { plateNo: "RAA 801 L", zoneId: createzone.id, busStopId: busStop?.id },
+  // await prisma.bus.createMany({
+  //   data: [
+  //     { plateNo: "RAC 239 W", zoneId: createzone.id, busStopId: busStop?.id, status: EStatus },
+  //     { plateNo: "RAD 500 Q", zoneId: createzone.id, busStopId: busStop?.id },
+  //     { plateNo: "RAA 801 L", zoneId: createzone.id, busStopId: busStop?.id },
 
-      { plateNo: "RAB 600 Q", zoneId: createzone.id, busStopId: busStop?.id },
+  //     { plateNo: "RAB 600 Q", zoneId: createzone.id, busStopId: busStop?.id },
 
-      { plateNo: "RAE 790 M", zoneId: createzone.id, busStopId: busStop?.id },
-      { plateNo: "RAD 399 K", zoneId: createzone.id, busStopId: busStop?.id },
-    ],
-  });
+  //     { plateNo: "RAE 790 M", zoneId: createzone.id, busStopId: busStop?.id },
+  //     { plateNo: "RAD 399 K", zoneId: createzone.id, busStopId: busStop?.id },
+  //   ],
+  // });
 }
 main()
   .catch((e) => {
