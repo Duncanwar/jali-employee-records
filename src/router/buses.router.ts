@@ -3,7 +3,9 @@ import BusesController from "../controller/Buses/buses";
 
 const BusesRouter: Router = Router();
 
-// BusesRouter.post("/create-driver", BusesController.registerDriver);
 BusesRouter.get("/get-buses", BusesController.getBuses);
+BusesRouter.post("/create-buses", BusesController.getBuses);
+BusesRouter.put("/update-buses", BusesController.getBuses);
+BusesRouter.delete("/delete-buses", BusesController.getBuses);
 
 export default BusesRouter;
