@@ -8,7 +8,7 @@ async function main() {
       fullName: "dri1",
       email: "dr1@dr1.com",
       isActive: true,
-      role: ERole.ADMIN,
+      role: ERole.DRIVER,
       password: await bcrypt.hash("1212", 10),
     },
   });
@@ -22,7 +22,7 @@ async function main() {
       fullName: "Stanilas",
       email: "dr2@dr2.com",
       isActive: true,
-      role: ERole.ADMIN,
+      role: ERole.DRIVER,
       password: await bcrypt.hash("1212", 10),
     },
   });
@@ -36,7 +36,7 @@ async function main() {
       fullName: "Kamoso Dani",
       email: "dr3@dr3.com",
       isActive: true,
-      role: ERole.ADMIN,
+      role: ERole.DRIVER,
       password: await bcrypt.hash("1212", 10),
     },
   });
@@ -50,7 +50,7 @@ async function main() {
       fullName: "Mpano",
       email: "dr4@dr4.com",
       isActive: true,
-      role: ERole.ADMIN,
+      role: ERole.DRIVER,
       password: await bcrypt.hash("1212", 10),
     },
   });
@@ -64,7 +64,7 @@ async function main() {
       fullName: "Desire",
       email: "dr5@dr5.com",
       isActive: true,
-      role: ERole.ADMIN,
+      role: ERole.DRIVER,
       password: await bcrypt.hash("1212", 10),
     },
   });
@@ -78,7 +78,7 @@ async function main() {
       fullName: "Karoli",
       email: "dr6@dr6.com",
       isActive: true,
-      role: ERole.ADMIN,
+      role: ERole.DRIVER,
       password: await bcrypt.hash("1212", 10),
     },
   });
@@ -92,7 +92,7 @@ async function main() {
       fullName: "Mupenzi",
       email: "dr7@dr7.com",
       isActive: true,
-      role: ERole.ADMIN,
+      role: ERole.DRIVER,
       password: await bcrypt.hash("1212", 10),
     },
   });
