@@ -7,6 +7,7 @@ async function main() {
     data: {
       zoneName: "Corridor E",
       destination: "Kimironko",
+      managerId: 3,
     },
   });
   await prisma.busStop.createMany({
