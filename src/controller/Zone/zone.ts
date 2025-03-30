@@ -18,11 +18,14 @@ export default class ZoneController {
 
       // Fetch paginated drivers
       const zone = await prisma.zone.findMany({
-        // orderBy: { : "desc" },
         skip: (page - 1) * size,
         take: size,
         include: {
-          manager: true,
+          manager: {
+            include: {
+              user: true, // Fetch manager details from the User table
+            },
+          },
           buses: true,
           busStops: true,
         },
