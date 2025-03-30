@@ -12,7 +12,7 @@ async function main() {
       password: await bcrypt.hash("1212", 10),
     },
   });
-  await prisma.admin.create({
+  await prisma.driver.create({
     data: {
       userId: driver1.id,
     },
@@ -26,7 +26,7 @@ async function main() {
       password: await bcrypt.hash("1212", 10),
     },
   });
-  await prisma.admin.create({
+  await prisma.driver.create({
     data: {
       userId: driver2.id,
     },
@@ -40,7 +40,7 @@ async function main() {
       password: await bcrypt.hash("1212", 10),
     },
   });
-  await prisma.admin.create({
+  await prisma.driver.create({
     data: {
       userId: driver3.id,
     },
@@ -54,7 +54,7 @@ async function main() {
       password: await bcrypt.hash("1212", 10),
     },
   });
-  await prisma.admin.create({
+  await prisma.driver.create({
     data: {
       userId: driver4.id,
     },
@@ -68,7 +68,7 @@ async function main() {
       password: await bcrypt.hash("1212", 10),
     },
   });
-  await prisma.admin.create({
+  await prisma.driver.create({
     data: {
       userId: driver5.id,
     },
@@ -82,7 +82,7 @@ async function main() {
       password: await bcrypt.hash("1212", 10),
     },
   });
-  await prisma.admin.create({
+  await prisma.driver.create({
     data: {
       userId: driver6.id,
     },
@@ -96,7 +96,7 @@ async function main() {
       password: await bcrypt.hash("1212", 10),
     },
   });
-  await prisma.admin.create({
+  await prisma.driver.create({
     data: {
       userId: driver7.id,
     },
