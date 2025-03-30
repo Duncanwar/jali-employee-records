@@ -62,7 +62,9 @@ export default class DriverController {
         skip: (page - 1) * size,
         take: size,
         include: {
-          user: true, // Include user details
+          user: true,
+
+          // Include user details
         },
       });
 
@@ -97,5 +99,15 @@ export default class DriverController {
       include: { driver: true },
     });
     return Response.send(res, 200, "your day off", dayoff);
+  }
+
+  static async deleteDriver(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    const { id } = req.params;
+    const driver = await prisma.driver.delete({ where: { id: Number(id) } });
+    return Response.send(res, 200, "delete a driver successfully");
   }
 }

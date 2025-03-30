@@ -22,8 +22,8 @@ export default class BusStopController {
         skip: (page - 1) * size,
         take: size,
         include: {
-          buses: true, // Changed from Bus to buses
-          subManager: true, // Changed from User to subManager
+          buses: true, // Include user details
+          subManager: true, // Include
           zone: true,
         },
       });
@@ -47,9 +47,52 @@ export default class BusStopController {
     try {
       // Fetch paginated drivers
       const { busStopName, zoneId } = req.body;
-      const busStop = await prisma.busStop.findMany();
+      const busStop = await prisma.busStop.create({
+        data: { busStopName: busStopName, zoneId: zoneId },
+      });
 
-      return Response.send(res, 200, "Bus Stop retrieved successfully");
+      return Response.send(
+        res,
+        200,
+        "Bus Stop retrieved successfully",
+        busStop
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async updateBusStop(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      // Fetch paginated drivers
+      const { id } = req.params;
+      const { ...data } = req.params;
+      const busStop = await prisma.busStop.update({
+        where: { id: Number(id) },
+        data: data,
+      });
+      if (!busStop) return;
+      return Response.send(res, 200, "Bus Stop Updated successfully", busStop);
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async deleteBusStop(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      // Fetch paginated drivers
+      const { id } = req.params;
+      const busStop = await prisma.busStop.findUnique({
+        where: { id: Number(id) },
+      });
+      if (!busStop) return;
+      return Response.send(res, 200, "Bus Stop Updated successfully", busStop);
     } catch (error) {
       next(error);
     }

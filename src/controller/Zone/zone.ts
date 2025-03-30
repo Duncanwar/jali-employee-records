@@ -56,4 +56,42 @@ export default class ZoneController {
       next(error);
     }
   }
+  static async updateZone(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      const { id } = req.params;
+      const { ...data } = req.body;
+
+      // Fetch paginated drivers
+      const zone = await prisma.zone.update({
+        where: { id: Number(id) },
+        data: data,
+      });
+
+      return Response.send(res, 200, "Zone updated successfully", zone);
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async deleteZone(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      const { id } = req.params;
+
+      // Fetch paginated drivers
+      const zone = await prisma.zone.delete({
+        where: { id: Number(id) },
+      });
+
+      return Response.send(res, 200, "Zone deleted successfully", zone);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
