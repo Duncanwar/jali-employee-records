@@ -22,18 +22,36 @@ export default class ZoneController {
         skip: (page - 1) * size,
         take: size,
         include: {
-          Bus: true, // Include user details
-          User: true, // Include
-          BusStop: true, // Include
+          manager: true,
+          buses: true,
+          busStops: true,
         },
       });
 
-      return Response.send(res, 200, "Drivers retrieved successfully", {
+      return Response.send(res, 200, "Zone retrieved successfully", {
         items: zone,
         itemCount: zone.length,
         itemsPerPage: size,
         currentPage: page,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async createZone(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      const { ...data } = req.body;
+
+      // Fetch paginated drivers
+      const zone = await prisma.zone.create({
+        data: data,
+      });
+
+      return Response.send(res, 200, "Zone created successfully");
     } catch (error) {
       next(error);
     }

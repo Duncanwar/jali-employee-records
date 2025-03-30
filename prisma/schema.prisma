@@ -7,6 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CarStatus {
+  DAMAGED
+  GOOD_CONDITION
+  MAINTENANCE
+}
+
+enum DailyCarCondition {
+  TIRE
+  ENGINE
+  BRAKE
+  LIGHT
+}
+
 model User {
   id                      Int                       @id @default(autoincrement())
   createdAt               DateTime                  @default(now())
@@ -20,12 +33,10 @@ model User {
   zoneId                  Int?
   Admin                   Admin[]
   DailyActivity           DailyActivity[]
-  Driver                  Driver[]
-  Manager                 Manager[]
-  BusStop                 BusStop?                  @relation(fields: [busStopId], references: [id])
-  Zone                    Zone?                     @relation(fields: [zoneId], references: [id])
+  Driver                  Driver?
+  Manager                 Manager?
+  SubManager              SubManager?
   WeelkyTimeTableActivity WeelkyTimeTableActivity[]
-  SubManager              SubManager[]
   LeaveSchedule           LeaveSchedule[]
 }
 
@@ -33,7 +44,7 @@ model Admin {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    Int
+  userId    Int      @unique
   user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -41,16 +52,45 @@ model Manager {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    Int
+  userId    Int      @unique
   user      User     @relation(fields: [userId], references: [id])
+  zones     Zone[] // One manager manages multiple zones
+}
+
+model Zone {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  zoneName    String
+  destination String
+  managerId   Int
+
+  manager  Manager   @relation(fields: [managerId], references: [id]) // Many zones belong to one manager
+  buses    Bus[]
+  busStops BusStop[]
 }
 
 model SubManager {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+  busStopId Int?     @unique
+
+  user    User     @relation(fields: [userId], references: [id])
+  busStop BusStop? @relation(fields: [busStopId], references: [id]) // Only `fields` & `references` here
+}
+
+model BusStop {
+  id          Int         @id @default(autoincrement())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  busStopName String
+  zoneId      Int
+  subManager  SubManager? // No `@relation` needed here
+
+  zone  Zone  @relation(fields: [zoneId], references: [id])
+  buses Bus[]
 }
 
 model Driver {
@@ -58,37 +98,16 @@ model Driver {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   status    EStatus  @default(AVAILABLE)
-  userId    Int
+  userId    Int      @unique
   user      User     @relation(fields: [userId], references: [id])
-}
-
-model Zone {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  zoneName    String
-  destination String
-  Bus         Bus[]
-  BusStop     BusStop[]
-  User        User[]
-}
-
-model BusStop {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  busStopName String
-  zoneId      Int
-  zone        Zone     @relation(fields: [zoneId], references: [id])
-  User        User[]
-  Bus         Bus[]
 }
 
 model Bus {
   id                      Int                       @id @default(autoincrement())
   plateNo                 String                    @unique
-  status                  EStatus
+  status                  EStatus                   @default(AVAILABLE)
   zoneId                  Int
+  CarStatus               CarStatus                 @default(GOOD_CONDITION)
   zone                    Zone                      @relation(fields: [zoneId], references: [id])
   busStopId               Int
   busStop                 BusStop                   @relation(fields: [busStopId], references: [id])
@@ -110,19 +129,19 @@ model WeelkyTimeTableActivity {
 }
 
 model DailyActivity {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  driverId    Int
-  busId       Int
-  description String?
-  bus         Bus      @relation(fields: [busId], references: [id])
-  driver      User     @relation(fields: [driverId], references: [id])
-
-  // New fields for tracking car wash and bus arrival events
-  carWashStartTime DateTime? // Time when bus is out of car wash
-  busArrivalTime   DateTime? // Time when sub-manager approves arrival
-  carWashEndTime   DateTime? // Time when bus is back in car wash
+  id                Int                 @id @default(autoincrement())
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  driverId          Int
+  busId             Int
+  description       String?
+  bus               Bus                 @relation(fields: [busId], references: [id])
+  driver            User                @relation(fields: [driverId], references: [id])
+  CarStatus         CarStatus           @default(GOOD_CONDITION)
+  DailyCarCondition DailyCarCondition[]
+  carWashStartTime  DateTime? // Time when bus is out of car wash
+  busArrivalTime    DateTime? // Time when sub-manager approves arrival
+  carWashEndTime    DateTime? // Time when bus is back in car wash
 }
 
 model LeaveSchedule {

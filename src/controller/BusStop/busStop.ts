@@ -38,4 +38,19 @@ export default class BusStopController {
       next(error);
     }
   }
+  static async createBusStop(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      // Fetch paginated drivers
+      const { busStopName, zoneId } = req.body;
+      const busStop = await prisma.busStop.findMany();
+
+      return Response.send(res, 200, "Bus Stop retrieved successfully");
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -8,6 +8,7 @@ import BusStopRoute from "./busStop.router";
 import WeeklyTimetable from "./weeklyTimetable.router";
 import ManagerRoute from "./manager.route";
 import DailyRoute from "./dailyActivity";
+import ZoneRoute from "./zone.router";
 import isManager from "../middleware/isManager";
 import isSubManager from "../middleware/isSubManager";
 
@@ -28,6 +29,7 @@ router.use(
   [authenticate, isSubManager],
   ErrorHandler.watch(DailyRoute)
 );
+router.use("/zone", [authenticate], ErrorHandler.watch(ZoneRoute));
 
 router.all("/*", ErrorHandler.notFound);
 
