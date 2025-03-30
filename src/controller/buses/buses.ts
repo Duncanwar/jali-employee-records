@@ -22,7 +22,8 @@ export default class BusesController {
         skip: (page - 1) * size,
         take: size,
         include: {
-          busStop: true, // Include user details
+          busStop: true, 
+          zone:true // Include user details
         },
       });
 

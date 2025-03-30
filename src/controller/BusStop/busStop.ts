@@ -22,8 +22,8 @@ export default class BusStopController {
         skip: (page - 1) * size,
         take: size,
         include: {
-          Bus: true, // Include user details
-          User: true, // Include
+          buses: true, // Changed from Bus to buses
+          subManager: true, // Changed from User to subManager
           zone: true,
         },
       });
@@ -38,6 +38,7 @@ export default class BusStopController {
       next(error);
     }
   }
+  
   static async createBusStop(
     req: AuthenticatedRequest,
     res: ExpressResponse,

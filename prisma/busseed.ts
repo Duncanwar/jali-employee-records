@@ -3,12 +3,20 @@ import { EStatus, PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  // First, find an existing manager
+  const manager = await prisma.manager.findFirst();
+  if (!manager) {
+    throw new Error("No managers found! Please run seed.ts first.");
+  }
+
   const createzone = await prisma.zone.create({
     data: {
       zoneName: "Corridor E",
       destination: "Kimironko",
+      managerId: manager.id,  // Added the required managerId
     },
   });
+  
   await prisma.busStop.createMany({
     data: [
       {
@@ -39,6 +47,7 @@ async function main() {
   //   ],
   // });
 }
+
 main()
   .catch((e) => {
     console.error(e);
