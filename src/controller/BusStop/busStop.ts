@@ -38,6 +38,7 @@ export default class BusStopController {
       next(error);
     }
   }
+  
   static async createBusStop(
     req: AuthenticatedRequest,
     res: ExpressResponse,
