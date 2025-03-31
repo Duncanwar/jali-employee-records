@@ -1,10 +1,10 @@
 import { Response as ExpressResponse, NextFunction, Request } from "express";
 import { prisma } from "../../config/database";
 import Response from "../../services/response";
-import { dailyActivity } from "../DailyActivity/dailyActivity";
+import { User } from "@prisma/client";
 
 interface AuthenticatedRequest extends Request {
-  //   user?: User;
+  user?: User;
 }
 
 export default class ManagerController {
@@ -39,9 +39,8 @@ export default class ManagerController {
     }
   }
 
-  // Manager starts the car wash (create new activity when bus leaves car wash)
   static async startCarWash(req: Request, res: ExpressResponse) {
-    const { buses } = req.body; // busId, description, and userId (Manager)
+    const { buses } = req.body;
     const daysOfWeek = [
       "Sunday",
       "Monday",
@@ -73,49 +72,17 @@ export default class ManagerController {
             carWashStartTime: new Date(),
           },
         });
-        // console.log("here", today);
-        // console.log("todayTimetable", todayTimetable[0].driver.isActive);
         return res.json({ message: "Bus activity started", newActivity });
       } catch (error) {
         console.error(error);
       }
     }
-    // const busInActivity = await prisma.dailyActivity.findFirst({
-    //   where: { busId: busId },
-    // });
-    // if (busInActivity) {
-    //   return Response.send(res, 400, "Bus in activity");
-    // }
-    // try {
-    //   const driver = await prisma.weelkyTimeTableActivity.findFirst({
-    //     where: { busId: busId, dayOfWeek: today },
-    //     include: { bus: true, driver: true },
-    //   });
-
-    //   if (driver) {
-    //     const newActivity = await prisma.dailyActivity.create({
-    //       data: {
-    //         busId: busId,
-    //         driverId: driver.driverId,
-
-    //         carWashStartTime: new Date(), // Record the time bus leaves the car wash
-    //       },
-    //     });
-
-    //     return res.json({ message: "Bus activity started", newActivity });
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    // }
-    // Create a new DailyActivity for the bus when it leaves the car wash
-
     return res.status(500).json({ error: "Failed to start bus activity" });
   }
 
-  // Manager ends the day (bus goes back to car wash)
   static async endCarWash(req: Request, res: ExpressResponse) {
-    const { id } = req.params; // The DailyActivity ID
-    const { userId, busId, description } = req.body; // Assuming manager's userId is sent in the body
+    const { id } = req.params;
+    const { busId, description } = req.body; // Assuming manager's userId is sent in the body
 
     try {
       const dailyActivity = await prisma.dailyActivity.findFirst({

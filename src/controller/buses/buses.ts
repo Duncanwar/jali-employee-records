@@ -1,9 +1,10 @@
 import { Response as ExpressResponse, NextFunction, Request } from "express";
 import { prisma } from "../../config/database";
 import Response from "../../services/response";
+import { User } from "@prisma/client";
 
 interface AuthenticatedRequest extends Request {
-  //   user?: User;
+  user?: User;
 }
 
 export default class BusesController {
@@ -16,14 +17,12 @@ export default class BusesController {
       const page = parseInt(req.query.page as string) || 1;
       const size = parseInt(req.query.size as string) || 10;
 
-      // Fetch paginated drivers
       const bus = await prisma.bus.findMany({
-        // orderBy: { : "desc" },
         skip: (page - 1) * size,
         take: size,
         include: {
-          busStop: true, 
-          zone:true // Include user details
+          busStop: true,
+          zone: true,
         },
       });
 

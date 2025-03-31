@@ -2,9 +2,6 @@ import { ERole, EStatus, User } from "@prisma/client";
 import { Response as ExpressResponse, NextFunction, Request } from "express";
 import { prisma } from "../../config/database";
 import Response from "../../services/response";
-import { ForbiddenException } from "../../utils/exception";
-import { paginate } from "../../utils/pagination";
-import { CreateUserDTO } from "./dto";
 
 interface AuthenticatedRequest extends Request {
   user?: User;
@@ -62,8 +59,6 @@ export default class DriverController {
         take: size,
         include: {
           user: true,
-
-          // Include user details
         },
       });
 
@@ -85,6 +80,7 @@ export default class DriverController {
     console.log(req.user);
     const dayoff: any = await prisma.leaveSchedule.findFirst({
       where: { driverId: req.user?.id },
+      include: { driver: true },
     });
     return Response.send(res, 200, "your day off", dayoff);
   }
@@ -97,7 +93,7 @@ export default class DriverController {
     const dayoff: any = await prisma.leaveSchedule.findMany({
       include: { driver: true },
     });
-    return Response.send(res, 200, "your day off", dayoff);
+    return Response.send(res, 200, "All workers day off in a week", dayoff);
   }
 
   static async updateDriver(
