@@ -5,7 +5,7 @@ const BusesRouter: Router = Router();
 
 BusesRouter.get("/get-buses", BusesController.getBuses);
 BusesRouter.post("/create-buses", BusesController.createBus);
-BusesRouter.put("/update-buses", BusesController.getBuses);
-BusesRouter.delete("/delete-buses", BusesController.getBuses);
+BusesRouter.put("/:id/update-buses", BusesController.updateBus);
+BusesRouter.delete("/:id/delete-buses", BusesController.deleteBus);
 
 export default BusesRouter;
