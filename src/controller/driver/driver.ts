@@ -1,4 +1,4 @@
-import { Driver, ERole, EStatus, Prisma, User } from "@prisma/client";
+import { ERole, EStatus, User } from "@prisma/client";
 import { Response as ExpressResponse, NextFunction, Request } from "express";
 import { prisma } from "../../config/database";
 import Response from "../../services/response";
@@ -99,6 +99,19 @@ export default class DriverController {
     });
     return Response.send(res, 200, "your day off", dayoff);
   }
+  static async updateDriver(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    const { id } = req.params;
+    const { ...data } = req.body;
+    const driver = await prisma.driver.update({
+      where: { id: Number(id) },
+      data: data,
+    });
+    return Response.send(res, 200, "update a driver successfully", driver);
+  }
 
 
   static async updateDriver(
@@ -158,6 +171,6 @@ export default class DriverController {
   ): Promise<ExpressResponse | void> {
     const { id } = req.params;
     const driver = await prisma.driver.delete({ where: { id: Number(id) } });
-    return Response.send(res, 200, "delete a driver successfully");
+    return Response.send(res, 200, "delete a driver successfully", driver);
   }
 }

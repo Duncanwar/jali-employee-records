@@ -34,7 +34,7 @@ async function main() {
       fullName: "Kalisa Dan",
       email: "dan@subman.com",
       isActive: true,
-      role: ERole.MANAGER,
+      role: ERole.SUB_MANAGER,
       password: await bcrypt.hash("1212", 10),
     },
   });
