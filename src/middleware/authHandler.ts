@@ -17,9 +17,13 @@ export const authenticate = (
   }
   try {
     const isValid = JWTService.verifyToken(token);
+
     if (!isValid) {
+      console.log("here");
+
       throw new UnauthorizedException();
     } else {
+      console.log(isValid);
       req.user = isValid;
       next();
     }

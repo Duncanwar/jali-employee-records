@@ -41,7 +41,7 @@ export default class ManagerController {
 
   // Manager starts the car wash (create new activity when bus leaves car wash)
   static async startCarWash(req: Request, res: ExpressResponse) {
-    const { busId } = req.body; // busId, description, and userId (Manager)
+    const { buses } = req.body; // busId, description, and userId (Manager)
     const daysOfWeek = [
       "Sunday",
       "Monday",
@@ -52,37 +52,61 @@ export default class ManagerController {
       "Saturday",
     ];
     const today = daysOfWeek[new Date().getDay()];
-    console.log(new Date().getDay(), "Today");
-    const daily = await prisma.weelkyTimeTableActivity.findMany({
-      where: { dayOfWeek: today },
-    });
-    const busInActivity = await prisma.dailyActivity.findFirst({
-      where: { busId: busId },
-    });
-    if (busInActivity) {
-      return Response.send(res, 400, "Bus in activity");
-    }
-    try {
-      const driver = await prisma.weelkyTimeTableActivity.findFirst({
-        where: { busId: busId, dayOfWeek: today },
-        include: { bus: true, driver: true },
-      });
-
-      if (driver) {
-        const newActivity = await prisma.dailyActivity.create({
-          data: {
-            busId: busId,
-            driverId: driver.driverId,
-
-            carWashStartTime: new Date(), // Record the time bus leaves the car wash
-          },
+    console.log(buses);
+    for (const bus in buses) {
+      try {
+        const busInActivity = await prisma.dailyActivity.findFirst({
+          where: { busId: Number(bus) },
+        });
+        if (busInActivity) {
+          return Response.send(res, 400, "Bus in today activity");
+        }
+        const todayTimetable = await prisma.weelkyTimeTableActivity.findMany({
+          where: { dayOfWeek: today, busId: Number(bus) },
+          include: { bus: true, driver: true },
         });
 
+        const newActivity = await prisma.dailyActivity.create({
+          data: {
+            busId: Number(bus),
+            driverId: todayTimetable[0].driver.id,
+            carWashStartTime: new Date(),
+          },
+        });
+        // console.log("here", today);
+        // console.log("todayTimetable", todayTimetable[0].driver.isActive);
         return res.json({ message: "Bus activity started", newActivity });
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
     }
+    // const busInActivity = await prisma.dailyActivity.findFirst({
+    //   where: { busId: busId },
+    // });
+    // if (busInActivity) {
+    //   return Response.send(res, 400, "Bus in activity");
+    // }
+    // try {
+    //   const driver = await prisma.weelkyTimeTableActivity.findFirst({
+    //     where: { busId: busId, dayOfWeek: today },
+    //     include: { bus: true, driver: true },
+    //   });
+
+    //   if (driver) {
+    //     const newActivity = await prisma.dailyActivity.create({
+    //       data: {
+    //         busId: busId,
+    //         driverId: driver.driverId,
+
+    //         carWashStartTime: new Date(), // Record the time bus leaves the car wash
+    //       },
+    //     });
+
+    //     return res.json({ message: "Bus activity started", newActivity });
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    // }
     // Create a new DailyActivity for the bus when it leaves the car wash
 
     return res.status(500).json({ error: "Failed to start bus activity" });

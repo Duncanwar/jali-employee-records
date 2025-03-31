@@ -19,6 +19,7 @@ export default class AuthController {
           email: dto.email,
         },
       });
+      console.log(user);
       if (!user) {
         throw new NotFoundException("User not found");
       } else {

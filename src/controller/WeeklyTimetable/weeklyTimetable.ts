@@ -83,23 +83,40 @@ export async function generateWeeklyTimetable() {
       });
     }
   }
-
   await prisma.weelkyTimeTableActivity.createMany({ data: assignments });
-
+  ("******");
   console.log(
     `✅ Weekly timetable generated from ${startOfWeek.toDateString()} to ${endOfWeek.toDateString()}`
   );
 }
+cron.schedule("* 5 * * * ", async () => {
+  console.log("🚀 Generating weekly timetable...");
+  await generateWeeklyTimetable();
+});
 
 export async function getWeeklyTimetable(
   req: Request,
   res: ExpressResponse,
   next: NextFunction
 ): Promise<ExpressResponse | void> {
+  const today = new Date();
+  const dayIndex = today.getDay();
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1)); // Get Monday
+  startOfWeek.setHours(0, 0, 0, 0); // Set to start of the day
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6); // Get Sunday
+  endOfWeek.setHours(23, 59, 59, 999); // Set to end of the day
+
   const timetable = await prisma.weelkyTimeTableActivity.findMany({
+    where: {
+      startOfWeek: { gte: startOfWeek }, // Greater than or equal to start of the week
+      endOfWeek: { lte: endOfWeek }, // Less than or equal to end of the week
+    },
     include: { bus: true, driver: true },
   });
-  return Response.send(res, 201, "Timetable displayed", timetable);
+  return Response.send(res, 200, "Weekly Timetable", timetable);
 }
 export async function getDailyTimetable(
   req: Request,
@@ -126,4 +143,31 @@ export async function getDailyTimetable(
     },
   });
   return Response.send(res, 201, "Timetable for Today", timetable);
+}
+export async function searchDayTimetable(
+  req: Request,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<ExpressResponse | void> {
+  const day = req.query.day as string;
+  console.log(req.query);
+  const today = new Date();
+  const dayIndex = today.getDay();
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1)); // Get Monday
+  startOfWeek.setHours(0, 0, 0, 0); // Set to start of the day
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6); // Get Sunday
+  endOfWeek.setHours(23, 59, 59, 999); // Set to end of the day
+
+  const timetable = await prisma.weelkyTimeTableActivity.findMany({
+    where: {
+      startOfWeek: { gte: startOfWeek }, // Greater than or equal to start of the week
+      dayOfWeek: day,
+      endOfWeek: { lte: endOfWeek }, // Less than or equal to end of the week
+    },
+    include: { bus: true, driver: true },
+  });
+  return Response.send(res, 200, "Weekly Timetable", timetable);
 }
