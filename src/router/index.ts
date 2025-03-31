@@ -11,6 +11,8 @@ import DailyRoute from "./dailyActivity";
 import ZoneRoute from "./zone.router";
 import isManager from "../middleware/isManager";
 import isSubManager from "../middleware/isSubManager";
+import AdminRouter from "./admin.router"; 
+import isAdmin from "../middleware/isAdmin"; 
 
 const router: Router = Router();
 
@@ -30,6 +32,12 @@ router.use(
   ErrorHandler.watch(DailyRoute)
 );
 router.use("/zone", [authenticate], ErrorHandler.watch(ZoneRoute));
+
+router.use(
+  "/admin",
+  [authenticate, isAdmin],
+  ErrorHandler.watch(AdminRouter)
+);
 
 router.all("/*", ErrorHandler.notFound);
 

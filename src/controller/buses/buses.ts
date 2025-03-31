@@ -69,7 +69,6 @@ export default class BusesController {
       const { id } = req.params;
       const { plateNo, zoneId, busStopId, status } = req.body;
 
-      // Fetch paginated drivers
       const bus = await prisma.bus.update({
         where: { id: Number(id) },
         data: {
@@ -93,7 +92,6 @@ export default class BusesController {
     try {
       const { id } = req.params;
 
-      // Fetch paginated drivers
       const bus = await prisma.bus.delete({
         where: { id: Number(id) },
       });

@@ -22,8 +22,8 @@ export default class BusStopController {
         skip: (page - 1) * size,
         take: size,
         include: {
-          buses: true, // Include user details
-          subManager: true, // Include
+          buses: true, 
+          subManager: true,
           zone: true,
         },
       });
@@ -53,46 +53,49 @@ export default class BusStopController {
 
       return Response.send(
         res,
-        200,
-        "Bus Stop retrieved successfully",
+        201,
+        "Bus Stop created successfully",
         busStop
       );
     } catch (error) {
       next(error);
     }
   }
+  
   static async updateBusStop(
     req: AuthenticatedRequest,
     res: ExpressResponse,
     next: NextFunction
   ): Promise<ExpressResponse | void> {
     try {
-      // Fetch paginated drivers
       const { id } = req.params;
-      const { ...data } = req.params;
+      const updateData = req.body; // FIXED: Get data from request body, not params
+      
       const busStop = await prisma.busStop.update({
         where: { id: Number(id) },
-        data: data,
+        data: updateData,
       });
-      if (!busStop) return;
-      return Response.send(res, 200, "Bus Stop Updated successfully", busStop);
+      
+      return Response.send(res, 200, "Bus Stop updated successfully", busStop);
     } catch (error) {
       next(error);
     }
   }
+  
   static async deleteBusStop(
     req: AuthenticatedRequest,
     res: ExpressResponse,
     next: NextFunction
   ): Promise<ExpressResponse | void> {
     try {
-      // Fetch paginated drivers
       const { id } = req.params;
-      const busStop = await prisma.busStop.findUnique({
+      
+      // FIXED: Actually delete the bus stop instead of just finding it
+      const busStop = await prisma.busStop.delete({
         where: { id: Number(id) },
       });
-      if (!busStop) return;
-      return Response.send(res, 200, "Bus Stop Updated successfully", busStop);
+      
+      return Response.send(res, 200, "Bus Stop deleted successfully", busStop);
     } catch (error) {
       next(error);
     }
