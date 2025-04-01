@@ -8,6 +8,33 @@ interface AuthenticatedRequest extends Request {
 }
 
 export default class ManagerController {
+  static async registerManager(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      const userDTO = req.body;
+
+      if (!userDTO.role) {
+        return Response.send(res, 400, "Role is required");
+      }
+
+      const user: User = await prisma.user.create({
+        data: userDTO,
+      });
+
+      const manager = await prisma.manager.create({
+        data: {
+          userId: user.id,
+        },
+      });
+
+      return Response.send(res, 201, "Manager created", { user, manager });
+    } catch (error) {
+      next(error);
+    }
+  }
   static async getManager(
     req: AuthenticatedRequest,
     res: ExpressResponse,
@@ -17,18 +44,15 @@ export default class ManagerController {
       const page = parseInt(req.query.page as string) || 1;
       const size = parseInt(req.query.size as string) || 10;
 
-      // Fetch paginated drivers
       const manager = await prisma.manager.findMany({
-        // orderBy: { : "desc" },
         skip: (page - 1) * size,
         take: size,
         include: {
-          // Include user details
           user: true,
         },
       });
 
-      return Response.send(res, 200, "Drivers retrieved successfully", {
+      return Response.send(res, 200, "Managers retrieved successfully", {
         items: manager,
         itemCount: manager.length,
         itemsPerPage: size,
@@ -82,15 +106,15 @@ export default class ManagerController {
 
   static async endCarWash(req: Request, res: ExpressResponse) {
     const { id } = req.params;
-    const { busId, description } = req.body; // Assuming manager's userId is sent in the body
+    const { busId, description } = req.body;
 
     try {
       const dailyActivity = await prisma.dailyActivity.findFirst({
         where: {
           id: parseInt(id),
 
-          busId: busId, // Ensure the activity belongs to this bus
-          carWashEndTime: null, // Only update if the bus has not returned to the car wash yet
+          busId: busId,
+          carWashEndTime: null,
         },
       });
 
@@ -100,7 +124,6 @@ export default class ManagerController {
           .json({ error: "No ongoing activity found for the specified bus" });
       }
 
-      // Update the end time of the car wash
       const updatedActivity = await prisma.dailyActivity.update({
         where: { id: parseInt(id) },
         data: {
@@ -134,5 +157,64 @@ export default class ManagerController {
       itemsPerPage: size,
       currentPage: page,
     });
+  }
+  static async updateManager(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+
+      const manager = await prisma.manager.findUnique({
+        where: { id: Number(id) },
+      });
+
+      if (!manager) {
+        return Response.send(res, 404, "Sub Manager not found");
+      }
+
+      if (
+        updateData.fullName ||
+        updateData.email ||
+        updateData.isActive !== undefined
+      ) {
+        const userData: any = {};
+        if (updateData.fullName) userData.fullName = updateData.fullName;
+        if (updateData.email) userData.email = updateData.email;
+
+        await prisma.user.update({
+          where: { id: manager.userId },
+          data: userData,
+        });
+      }
+
+      const updatedManager = await prisma.manager.findUnique({
+        where: { id: Number(id) },
+        include: { user: true },
+      });
+
+      return Response.send(
+        res,
+        200,
+        "Manager updated successfully",
+        updatedManager ?? {}
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteManager(
+    req: AuthenticatedRequest,
+    res: ExpressResponse,
+    next: NextFunction
+  ): Promise<ExpressResponse | void> {
+    const { id } = req.params;
+    const manager = await prisma.manager.delete({
+      where: { id: Number(id) },
+    });
+    return Response.send(res, 200, "delete a manager successfully", manager);
   }
 }
