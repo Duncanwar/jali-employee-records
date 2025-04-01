@@ -15,4 +15,6 @@ router.post("/daily-activity/:id/end-car-wash", ManagerController.endCarWash);
 router.get("/get-submanager", ManagerController.getManager);
 router.put("/:id/update-submanager", ManagerController.updateManager);
 router.put("/:id/delete-submanager", ManagerController.deleteManager);
+router.get("/daily-activity", ManagerController.getDailyActivity);
+
 export default router;
