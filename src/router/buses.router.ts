@@ -1,5 +1,5 @@
 import { Router } from "express";
-import BusesController from "../controller/Buses/buses";
+import BusesController from "../controller/buses/buses";
 
 const BusesRouter: Router = Router();
 
