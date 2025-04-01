@@ -21,8 +21,8 @@ export default class AdminController {
         skip: (page - 1) * size,
         take: size,
         include: {
-          user: true, // Include user details
-          zones: true, // Include zones managed by this manager
+          user: true,
+          zones: true,
         },
       });
 

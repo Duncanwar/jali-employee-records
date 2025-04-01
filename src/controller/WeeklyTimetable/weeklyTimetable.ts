@@ -7,10 +7,9 @@ export async function generateWeeklyTimetable() {
   const today = new Date();
   const dayIndex = today.getDay();
   const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1)); // Get Monday
+  startOfWeek.setDate(today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1));
   const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Get Sunday
-
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
   const buses = await prisma.bus.findMany();
   const drivers = await prisma.driver.findMany({ include: { user: true } });
 
@@ -30,13 +29,12 @@ export async function generateWeeklyTimetable() {
     "Sunday",
   ];
 
-  // Assign unique leave days to drivers
   const driverLeaveMap = new Map();
   for (const driver of sortedDrivers) {
     let leaveDay;
     do {
       leaveDay = weekDays[Math.floor(Math.random() * weekDays.length)];
-    } while (driverLeaveMap.has(leaveDay)); // Ensure uniqueness
+    } while (driverLeaveMap.has(leaveDay));
     driverLeaveMap.set(driver.userId, leaveDay);
 
     const leaveDate = new Date(startOfWeek);
@@ -50,46 +48,48 @@ export async function generateWeeklyTimetable() {
   }
 
   const assignments = [];
-
+  const groupSize = 6;
   for (let i = 0; i < 7; i++) {
     const dayOfWeek = weekDays[i];
-    const assignedDrivers = new Set(); // Track assigned drivers for this day
-    let availableDrivers = [...sortedDrivers];
+    const assignedDrivers = new Set();
 
-    for (const bus of buses) {
-      // Filter drivers who are available and not on leave
-      const validDrivers = availableDrivers.filter(
-        (d) =>
-          driverLeaveMap.get(d.userId) !== dayOfWeek &&
-          !assignedDrivers.has(d.userId)
-      );
+    for (let j = 0; j < buses.length; j += groupSize) {
+      const busGroup = buses.slice(j, j + groupSize);
+      const driverGroup = sortedDrivers.slice(j, j + 7);
 
-      if (validDrivers.length === 0) continue; // No available driver for this bus
+      for (let k = 0; k < busGroup.length; k++) {
+        const bus = busGroup[k];
+        const driver = driverGroup.find(
+          (d) =>
+            driverLeaveMap.get(d.userId) !== dayOfWeek &&
+            !assignedDrivers.has(d.userId)
+        );
 
-      const driver = validDrivers.shift(); // Pick the first available driver
-      assignedDrivers.add(driver?.userId); // Mark driver as assigned
-      availableDrivers = availableDrivers.filter(
-        (d) => d.userId !== driver?.userId
-      ); // Remove from pool
+        if (!driver) continue;
 
-      assignments.push({
-        busId: bus.id,
-        driverId: driver?.userId ?? 0,
-        startOfWeek,
-        endOfWeek,
-        dayOfWeek,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+        assignedDrivers.add(driver.userId);
+
+        assignments.push({
+          busId: bus.id,
+          driverId: driver.userId,
+          startOfWeek,
+          endOfWeek,
+          dayOfWeek,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
     }
   }
+
   await prisma.weelkyTimeTableActivity.createMany({ data: assignments });
-  ("******");
+
   console.log(
     `✅ Weekly timetable generated from ${startOfWeek.toDateString()} to ${endOfWeek.toDateString()}`
   );
 }
-cron.schedule("* 5 * * * ", async () => {
+
+cron.schedule("0 4 * * * ", async () => {
   console.log("🚀 Generating weekly timetable...");
   await generateWeeklyTimetable();
 });
@@ -102,17 +102,16 @@ export async function getWeeklyTimetable(
   const today = new Date();
   const dayIndex = today.getDay();
   const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1)); // Get Monday
-  startOfWeek.setHours(0, 0, 0, 0); // Set to start of the day
-
+  startOfWeek.setDate(today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1));
+  startOfWeek.setHours(0, 0, 0, 0);
   const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Get Sunday
-  endOfWeek.setHours(23, 59, 59, 999); // Set to end of the day
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
 
   const timetable = await prisma.weelkyTimeTableActivity.findMany({
     where: {
-      startOfWeek: { gte: startOfWeek }, // Greater than or equal to start of the week
-      endOfWeek: { lte: endOfWeek }, // Less than or equal to end of the week
+      startOfWeek: { gte: startOfWeek },
+      endOfWeek: { lte: endOfWeek },
     },
     include: { bus: true, driver: true },
   });
@@ -123,7 +122,6 @@ export async function getDailyTimetable(
   res: ExpressResponse,
   next: NextFunction
 ): Promise<ExpressResponse | void> {
-  // const { dayOfWeek } = req.params;
   const daysOfWeek = [
     "Sunday",
     "Monday",
@@ -134,7 +132,6 @@ export async function getDailyTimetable(
     "Saturday",
   ];
   const today = daysOfWeek[new Date().getDay()];
-  console.log(today);
   const timetable = await prisma.weelkyTimeTableActivity.findMany({
     where: { dayOfWeek: today },
     include: {
@@ -154,18 +151,17 @@ export async function searchDayTimetable(
   const today = new Date();
   const dayIndex = today.getDay();
   const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1)); // Get Monday
-  startOfWeek.setHours(0, 0, 0, 0); // Set to start of the day
-
+  startOfWeek.setDate(today.getDate() - dayIndex + (dayIndex === 0 ? -6 : 1));
+  startOfWeek.setHours(0, 0, 0, 0);
   const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Get Sunday
-  endOfWeek.setHours(23, 59, 59, 999); // Set to end of the day
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
 
   const timetable = await prisma.weelkyTimeTableActivity.findMany({
     where: {
-      startOfWeek: { gte: startOfWeek }, // Greater than or equal to start of the week
+      startOfWeek: { gte: startOfWeek },
       dayOfWeek: day,
-      endOfWeek: { lte: endOfWeek }, // Less than or equal to end of the week
+      endOfWeek: { lte: endOfWeek },
     },
     include: { bus: true, driver: true },
   });

@@ -16,12 +16,10 @@ export default class DriverController {
     try {
       const userDTO = req.body;
 
-      // Ensure role is defined
       if (!userDTO.role) {
         return Response.send(res, 400, "Role is required");
       }
 
-      // Create the user
       const user: User = await prisma.user.create({
         data: userDTO,
       });
@@ -52,14 +50,36 @@ export default class DriverController {
       const page = parseInt(req.query.page as string) || 1;
       const size = parseInt(req.query.size as string) || 10;
 
-      // Fetch paginated drivers
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const driversOnLeave = await prisma.leaveSchedule.findMany({
+        where: {
+          leaveDate: {
+            gte: today,
+            lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+        },
+        select: { driverId: true },
+      });
+
+      const driversOnLeaveIds = driversOnLeave.map((d) => d.driverId);
+
+      await prisma.driver.updateMany({
+        where: { userId: { in: driversOnLeaveIds } },
+        data: { status: EStatus.NOT_AVAILABLE },
+      });
+
+      await prisma.driver.updateMany({
+        where: { userId: { notIn: driversOnLeaveIds } },
+        data: { status: EStatus.AVAILABLE },
+      });
+
       const drivers = await prisma.driver.findMany({
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * size,
         take: size,
-        include: {
-          user: true,
-        },
+        include: { user: true },
       });
 
       return Response.send(res, 200, "Drivers retrieved successfully", {
@@ -72,6 +92,7 @@ export default class DriverController {
       next(error);
     }
   }
+
   static async dayOffByUser(
     req: AuthenticatedRequest,
     res: ExpressResponse,
@@ -105,7 +126,6 @@ export default class DriverController {
       const { id } = req.params;
       const updateData = req.body;
 
-      // Find the driver to get the userId
       const driver = await prisma.driver.findUnique({
         where: { id: Number(id) },
       });
@@ -114,7 +134,6 @@ export default class DriverController {
         return Response.send(res, 404, "Driver not found");
       }
 
-      // Update the driver status if provided
       if (updateData.status) {
         await prisma.driver.update({
           where: { id: Number(id) },
@@ -122,7 +141,6 @@ export default class DriverController {
         });
       }
 
-      // Update the user information if provided
       if (
         updateData.fullName ||
         updateData.email ||
