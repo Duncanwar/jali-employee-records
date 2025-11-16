@@ -44,7 +44,6 @@ export default class BusesController {
     try {
       const { plateNo, zoneId, busStopId, status } = req.body;
 
-      // Fetch paginated drivers
       const bus = await prisma.bus.create({
         data: {
           plateNo: plateNo,

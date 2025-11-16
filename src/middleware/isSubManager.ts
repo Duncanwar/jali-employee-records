@@ -13,7 +13,7 @@ const isSubManager = (
   next: NextFunction
 ): void => {
   if (!req.user) throw new Error();
-  console.log(req.user); // Debugging line
+  console.log(req.user);
 
   if (req.user.role !== ERole.SUB_MANAGER) {
     throw new UnauthorizedException("Access denied. SubManager only.");

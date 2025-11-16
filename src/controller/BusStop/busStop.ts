@@ -2,9 +2,7 @@ import { Response as ExpressResponse, NextFunction, Request } from "express";
 import { prisma } from "../../config/database";
 import Response from "../../services/response";
 
-interface AuthenticatedRequest extends Request {
-  //   user?: User;
-}
+interface AuthenticatedRequest extends Request {}
 
 export default class BusStopController {
   static async getBusStop(
@@ -16,9 +14,7 @@ export default class BusStopController {
       const page = parseInt(req.query.page as string) || 1;
       const size = parseInt(req.query.size as string) || 10;
 
-      // Fetch paginated drivers
       const busStop = await prisma.busStop.findMany({
-        // orderBy: { : "desc" },
         skip: (page - 1) * size,
         take: size,
         include: {
@@ -45,7 +41,6 @@ export default class BusStopController {
     next: NextFunction
   ): Promise<ExpressResponse | void> {
     try {
-      // Fetch paginated drivers
       const { busStopName, zoneId } = req.body;
       const busStop = await prisma.busStop.create({
         data: { busStopName: busStopName, zoneId: zoneId },
@@ -64,7 +59,7 @@ export default class BusStopController {
   ): Promise<ExpressResponse | void> {
     try {
       const { id } = req.params;
-      const updateData = req.body; // FIXED: Get data from request body, not params
+      const updateData = req.body;
 
       const busStop = await prisma.busStop.update({
         where: { id: Number(id) },
@@ -85,7 +80,6 @@ export default class BusStopController {
     try {
       const { id } = req.params;
 
-      // FIXED: Actually delete the bus stop instead of just finding it
       const busStop = await prisma.busStop.delete({
         where: { id: Number(id) },
       });

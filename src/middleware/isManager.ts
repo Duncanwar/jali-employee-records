@@ -13,7 +13,7 @@ const isManager = (
   next: NextFunction
 ): void => {
   if (!req.user) throw new Error();
-  console.log(req.user); // Debugging line
+  console.log(req.user);
 
   if (req.user.role !== ERole.MANAGER) {
     throw new UnauthorizedException("Access denied. Manager only.");

@@ -2,9 +2,7 @@ import { Response as ExpressResponse, NextFunction, Request } from "express";
 import { prisma } from "../../config/database";
 import Response from "../../services/response";
 
-interface AuthenticatedRequest extends Request {
-  //   user?: User;
-}
+interface AuthenticatedRequest extends Request {}
 
 export default class ZoneController {
   static async getZone(
@@ -16,14 +14,13 @@ export default class ZoneController {
       const page = parseInt(req.query.page as string) || 1;
       const size = parseInt(req.query.size as string) || 10;
 
-      // Fetch paginated drivers
       const zone = await prisma.zone.findMany({
         skip: (page - 1) * size,
         take: size,
         include: {
           manager: {
             include: {
-              user: true, // Fetch manager details from the User table
+              user: true,
             },
           },
           buses: true,
@@ -49,7 +46,6 @@ export default class ZoneController {
     try {
       const { ...data } = req.body;
 
-      // Fetch paginated drivers
       const zone = await prisma.zone.create({
         data: data,
       });
@@ -68,7 +64,6 @@ export default class ZoneController {
       const { id } = req.params;
       const { ...data } = req.body;
 
-      // Fetch paginated drivers
       const zone = await prisma.zone.update({
         where: { id: Number(id) },
         data: data,
@@ -87,7 +82,6 @@ export default class ZoneController {
     try {
       const { id } = req.params;
 
-      // Fetch paginated drivers
       const zone = await prisma.zone.delete({
         where: { id: Number(id) },
       });
